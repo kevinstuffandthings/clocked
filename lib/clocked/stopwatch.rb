@@ -2,16 +2,21 @@
 
 module Clocked
   class Stopwatch
-    Lap = Struct.new(:name, :start_time, :end_time) do
-      def elapsed
-        end_time - start_time
-      end
-
+    module Stringable
       def to_s
-        "#{name}: #{elapsed}s"
+        [name, "#{elapsed.round(3)}s"].compact.join(": ")
       end
     end
 
+    Lap = Struct.new(:name, :start_time, :end_time) do
+      include Stringable
+
+      def elapsed
+        end_time - start_time
+      end
+    end
+
+    include Stringable
     attr_reader :name, :laps, :start_time
 
     # Create a new stopwatch.
@@ -42,7 +47,7 @@ module Clocked
     # Generate a string-representation of the stopwatch and any laps.
     # @return [String]
     def to_s
-      text = [name, "#{elapsed}s"].compact.join(": ")
+      text = super
       text += " (#{laps.map(&:to_s).join(", ")})" unless laps.empty?
       text
     end
